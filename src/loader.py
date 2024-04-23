@@ -5,6 +5,7 @@ import numpy as np
 import util
 import trainer
 import dataloader
+import decoding
 
 BOS = "<BOS>"
 EOS = "<EOS>"
@@ -223,11 +224,26 @@ loader.load_model(
     '/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.nll_0.8365.acc_90.2491.dist_0.0521.epoch_85')
 
 #print(loader.model)
-
-print('function---------------------------------------------')
-print(loader.model.get_loss)
-
 data = TabSeparated('/home/ubuntu/transducer-rework/neural-transducer/data/latin-train')
 
 
-print(data.batch_sample(batch_size=64).__next__()[1].size())
+src, mask, _, _ = data.batch_sample(batch_size=64).__next__()
+
+print("TESTINGGGG")
+
+loader.model.eval()
+
+#loader.model(data.batch_sample(batch_size=64).__next__())
+
+decoder = decoding.Decoder(decoder_type=decoding.Decode.greedy)
+
+res, _ = decoder(loader.model, src, mask)
+
+pred = util.unpack_batch(res)
+
+for p in pred:
+    p = data.decode_target(p)
+    print(p)
+
+# // TODO: essentially need to rewrite the library so that we store that source
+#  and target vocab somewhere that is recoverable, not just the dataloader
