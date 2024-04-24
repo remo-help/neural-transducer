@@ -2,6 +2,7 @@ import torch
 from tqdm import tqdm
 from typing import Dict, List, Optional
 import numpy as np
+import pickle as pkl
 import util
 import trainer
 import dataloader
@@ -56,7 +57,8 @@ class InferenceDataloader(dataloader.Dataloader):
             self,
             file: List[str],
             test_file: Optional[List[str]] = None,
-            shuffle=False
+            shuffle=False,
+            load_vocab=None
     ):
         super().__init__()
         self.file = file[0] if len(file) == 1 else file
@@ -67,7 +69,7 @@ class InferenceDataloader(dataloader.Dataloader):
         self.batch_data: Dict[str, List] = dict()
         self.nb_file, self.nb_test = 0, 0
         self.nb_attr = 0
-        self.source, self.target = self.build_vocab()
+        self.source, self.target = self.build_vocab(path=load_vocab)
         self.source_vocab_size = len(self.source)
         self.target_vocab_size = len(self.target)
         self.attr_c2i: Optional[Dict]
@@ -93,18 +95,30 @@ class InferenceDataloader(dataloader.Dataloader):
         assert self.source[UNK_IDX] == UNK
         assert self.target[UNK_IDX] == UNK
 
-    def build_vocab(self):
-        src_set, trg_set = set(), set()
-        self.nb_file = 0
-        for src, trg in self.read_file(self.file):
-            self.nb_file += 1
-            src_set.update(src)
-            trg_set.update(trg)
-        if self.test_file is not None:
-            self.nb_test = sum([1 for _ in self.read_file(self.test_file)])
-        source = [PAD, BOS, EOS, UNK] + sorted(list(src_set))
-        target = [PAD, BOS, EOS, UNK] + sorted(list(trg_set))
+    def build_vocab(self, path: str = None):
+        if path:
+            with open(path, 'rb') as f:
+                vocabs = pkl.load(f)
+                source = vocabs['source']
+                target = vocabs['target']
+        else:
+            src_set, trg_set = set(), set()
+            self.nb_file = 0
+            for src, trg in self.read_file(self.file):
+                self.nb_file += 1
+                src_set.update(src)
+                trg_set.update(trg)
+            if self.test_file is not None:
+                self.nb_test = sum([1 for _ in self.read_file(self.test_file)])
+            source = [PAD, BOS, EOS, UNK] + sorted(list(src_set))
+            target = [PAD, BOS, EOS, UNK] + sorted(list(trg_set))
         return source, target
+
+    def store_vocab(self, path: str):
+        vocabs = {'source': self.source, 'target': self.target}
+        util.maybe_mkdir(path)
+        with open(path, 'wb+') as f:
+            pkl.dump(vocabs, f)
 
     def read_file(self, file):
         raise NotImplementedError
@@ -210,6 +224,7 @@ class InferenceDataloader(dataloader.Dataloader):
             trg.append(self.target_c2i[EOS])
             yield src, trg
 
+
 class TabSeparated(InferenceDataloader):
     def read_file(self, file):
         with open(file, "r", encoding="utf-8") as fp:
@@ -225,7 +240,6 @@ loader.load_model(
 
 #print(loader.model)
 data = TabSeparated('/home/ubuntu/transducer-rework/neural-transducer/data/latin-train')
-
 
 src, mask, _, _ = data.batch_sample(batch_size=64).__next__()
 
