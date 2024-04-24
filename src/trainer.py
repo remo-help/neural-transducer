@@ -315,6 +315,9 @@ class BaseTrainer(object):
     ):
         eval_tag = "".join(["{}_{}.".format(e.desc, e.res) for e in eval_res])
         fp = f"{model_fp}.nll_{devloss:.4f}.{eval_tag}epoch_{epoch_idx}"
+        vocab_path = model_fp + ".vocab"
+        if not os.path.isfile(vocab_path):
+            self.data.store_vocab(vocab_path)
         torch.save(self.model, fp)
         self.models.append(Evaluation(fp, devloss, eval_res))
 
