@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 
 import numpy as np
 import torch
+import pickle as pkl
 from tqdm import tqdm
 
 from align import Aligner
@@ -82,6 +83,11 @@ class Seq2SeqDataLoader(Dataloader):
         source = [PAD, BOS, EOS, UNK] + sorted(list(src_set))
         target = [PAD, BOS, EOS, UNK] + sorted(list(trg_set))
         return source, target
+
+    def store_vocab(self, path: str):
+        vocabs = {'source': self.source, 'target': self.target}
+        with open(path, 'wb+') as f:
+            pkl.dump(vocabs, f)
 
     def read_file(self, file):
         raise NotImplementedError
@@ -540,7 +546,6 @@ class TagSIGMORPHON2019Task1(TagSIGMORPHON2017Task1):
         source = [PAD, BOS, EOS, UNK] + chars + tags
         target = [PAD, BOS, EOS, UNK] + chars
         return source, target
-
 
 class TagSIGMORPHON2019Task2(TagSIGMORPHON2019Task1):
     def read_file(self, file):
