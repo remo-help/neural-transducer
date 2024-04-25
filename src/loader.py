@@ -49,7 +49,7 @@ class Loader:
         self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
 
         if self.params.decode_fn == 'beam':
-            self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=3)
+            self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=5)
         else:
             self.decoder = decoding.Decoder(decoder_type=decoding.Decode.greedy)
 
@@ -93,27 +93,76 @@ class Loader:
         pass
 
     def testing(self):
-        # load a test file and return results
-        pass
+        self.model.eval()
+        self.logger.info('Running testing')
+        with open(f"{self.params.model}.test.tsv", "w") as fp:
+            fp.write("prediction\ttarget\tloss\tdist\n")
+            avg_distance = []
+            norm_distance = []
+            accurates = 0
+            totals = 0
+            for src, src_mask, trg, trg_mask in tqdm(self.data.batch_sample(batch_size=self.batch_size),
+                                                 total=self.n_batches):
+                pred, _ = self.decoder(self.model, src, src_mask)
+            #self.evaluator.add(src, pred, trg)
+
+            #data = (src, src_mask, trg, trg_mask)
+            #losses = self.model.get_loss(data, reduction=False).cpu()
+
+                pred = util.unpack_batch(pred)
+                trg = util.unpack_batch(trg)
+                for p, t in zip(pred, trg):
+                    dist = util.edit_distance(p, t)
+                    norm_distance.append(dist/len(t))
+                    avg_distance.append(dist)
+                    p = self.data.decode_target(p)
+                    t = self.data.decode_target(t)
+                    if p == t:
+                        accurates +=1
+                    totals +=1
+                    fp.write(f'{" ".join(p)}\t{" ".join(t)}\t{dist}\n')
+            avg_distance = np.mean(np.array(avg_distance))
+            norm_distance = np.mean(np.array(norm_distance))
+            accuracy = accurates/totals
+            self.logger.info(f"Average edit distance: {avg_distance}")
+            self.logger.info(f"Normalized edit distance: {norm_distance}")
+            self.logger.info(f"Average accuracy: {accuracy}")
+            fp.write("\n ------------------------------------------------------------- \n")
+            fp.write(f"Average edit distance: {avg_distance}\n")
+            fp.write(f"Normalized edit distance: {norm_distance}\n")
+            fp.write(f"Average accuracy: {accuracy}")
+
 
     def inference(self):
         # infer on loaded data, return results
+        self.model.eval()
         results = []
         self.logger.info('Running inference')
         for src, mask in tqdm(self.data.batch_sample(batch_size=self.batch_size), total=self.n_batches):
-            res, _ = self.decoder(loader.model, src, mask)
+            res, _ = self.decoder(self.model, src, mask)
             pred = util.unpack_batch(res)
             decodes = []
             for p in pred:
                 p = ''.join(self.data.decode_target(p))
                 decodes.append(p)
-            results.append(decodes)
-        print(results)
+            results.extend(decodes)
+        self.results = results
+        self.save_results_inference()
+        return results
 
-    def save_results(self):
-        # save results in text format
-        pass
 
+    def save_results_inference(self):
+        with open(f"{self.params.file}.{self.params.mode}.tsv", "w") as fp:
+            for prediction in self.results:
+                fp.write(f"{prediction}\n")
+
+    def run(self):
+        if self.mode:
+            return self.inference()
+
+        else:
+            self.testing()
+            return None
 
 class InferenceDataloader(dataloader.Dataloader):
     def __init__(
@@ -304,16 +353,16 @@ class InferenceDataloader(dataloader.Dataloader):
     def test_sample(self):
         yield from self._sample(self.test_file)
 
-    def _iter_helper(self, file, inference=True):
-        if inference:
-            for source in self.read_file(file, inference=inference):
+    def _iter_helper(self, file):
+        if self.inference_mode:
+            for source in self.read_file(file, inference=self.inference_mode):
                 src = [self.source_c2i[BOS]]
                 for s in source:
                     src.append(self.source_c2i.get(s, UNK_IDX))
                 src.append(self.source_c2i[EOS])
                 yield src
         else:
-            for source, target in self.read_file(file, inference=inference):
+            for source, target in self.read_file(file, inference=self.inference_mode):
                 src = [self.source_c2i[BOS]]
                 for s in source:
                     src.append(self.source_c2i.get(s, UNK_IDX))
@@ -341,7 +390,7 @@ class TabSeparated(InferenceDataloader):
 
 loader = Loader()
 
-loader.inference()
+loader.run()
 
 #loader.load_model(
 #'/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.nll_0.8365.acc_90.2491.dist_0.0521.epoch_85')
