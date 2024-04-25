@@ -27,12 +27,23 @@ STEP_IDX = 4
 
 class Loader:
 
-    def __init__(self):
+    def __init__(self, cli=True, config=None):
+        '''
+        Initialize this class with cli=False to pass a config dictionary instead of using sys.var for the arguments
+        '''
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
         self.parser = argparse.ArgumentParser()
-        self.set_args()
-        self.params = self.get_params()
+
+        if not cli:
+            self.set_args()
+            config_list = []
+            for key in config:
+                config_list.extend(f'--{key} {config[key]}'.split())
+            self.params = self.parser.parse_args(config_list)
+        else:
+            self.set_args()
+            self.params = self.get_params()
 
         self.load_model(self.params.model)
 
@@ -49,7 +60,7 @@ class Loader:
         self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
 
         if self.params.decode_fn == 'beam':
-            self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=5)
+            self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=3)
         else:
             self.decoder = decoding.Decoder(decoder_type=decoding.Decode.greedy)
 
@@ -102,28 +113,28 @@ class Loader:
             accurates = 0
             totals = 0
             for src, src_mask, trg, trg_mask in tqdm(self.data.batch_sample(batch_size=self.batch_size),
-                                                 total=self.n_batches):
+                                                     total=self.n_batches):
                 pred, _ = self.decoder(self.model, src, src_mask)
-            #self.evaluator.add(src, pred, trg)
+                #self.evaluator.add(src, pred, trg)
 
-            #data = (src, src_mask, trg, trg_mask)
-            #losses = self.model.get_loss(data, reduction=False).cpu()
+                #data = (src, src_mask, trg, trg_mask)
+                #losses = self.model.get_loss(data, reduction=False).cpu()
 
                 pred = util.unpack_batch(pred)
                 trg = util.unpack_batch(trg)
                 for p, t in zip(pred, trg):
                     dist = util.edit_distance(p, t)
-                    norm_distance.append(dist/len(t))
+                    norm_distance.append(dist / len(t))
                     avg_distance.append(dist)
                     p = self.data.decode_target(p)
                     t = self.data.decode_target(t)
                     if p == t:
-                        accurates +=1
-                    totals +=1
+                        accurates += 1
+                    totals += 1
                     fp.write(f'{" ".join(p)}\t{" ".join(t)}\t{dist}\n')
             avg_distance = np.mean(np.array(avg_distance))
             norm_distance = np.mean(np.array(norm_distance))
-            accuracy = accurates/totals
+            accuracy = accurates / totals
             self.logger.info(f"Average edit distance: {avg_distance}")
             self.logger.info(f"Normalized edit distance: {norm_distance}")
             self.logger.info(f"Average accuracy: {accuracy}")
@@ -131,7 +142,6 @@ class Loader:
             fp.write(f"Average edit distance: {avg_distance}\n")
             fp.write(f"Normalized edit distance: {norm_distance}\n")
             fp.write(f"Average accuracy: {accuracy}")
-
 
     def inference(self):
         # infer on loaded data, return results
@@ -150,7 +160,6 @@ class Loader:
         self.save_results_inference()
         return results
 
-
     def save_results_inference(self):
         with open(f"{self.params.file}.{self.params.mode}.tsv", "w") as fp:
             for prediction in self.results:
@@ -163,6 +172,7 @@ class Loader:
         else:
             self.testing()
             return None
+
 
 class InferenceDataloader(dataloader.Dataloader):
     def __init__(
@@ -258,7 +268,7 @@ class InferenceDataloader(dataloader.Dataloader):
             key = self._file_identifier(file)
             if key not in self.batch_data:
                 lst = list()
-                for src in tqdm(self._iter_helper(file, inference=self.inference_mode), desc="read file"):
+                for src in tqdm(self._iter_helper(file), desc="read file"):
                     lst.append((src))
                 src_data, src_mask = self.list_to_tensor([src for src in lst])
 
@@ -388,7 +398,28 @@ class TabSeparated(InferenceDataloader):
                     yield list(X), list(y)
 
 
-loader = Loader()
+class DirectLoader(InferenceDataloader):
+    '''
+    Used to pass data directly, instead of loading it from a file.
+    '''
+
+    def read_file(self, file, inference=True):
+        if inference:
+            for item in file:
+                yield list(item)
+        else:
+            for item in file:
+                X, y = item
+                yield list(X), list(y)
+
+
+args = {
+        'model':'/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.nll_0.8365.acc_90.2491.dist_0.0521.epoch_85',
+        'vocab': '/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.vocab',
+        'file': '/home/ubuntu/transducer-rework/neural-transducer/data/latin-dev',
+        'mode': 'testing'}
+
+loader = Loader(cli=False, config=args)
 
 loader.run()
 
