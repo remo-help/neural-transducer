@@ -413,41 +413,4 @@ class DirectLoader(InferenceDataloader):
                 yield list(X), list(y)
 
 
-args = {
-        'model':'/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.nll_0.8365.acc_90.2491.dist_0.0521.epoch_85',
-        'vocab': '/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.vocab',
-        'file': '/home/ubuntu/transducer-rework/neural-transducer/data/latin-dev',
-        'mode': 'testing'}
 
-loader = Loader(cli=False, config=args)
-
-loader.run()
-
-#loader.load_model(
-#'/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.nll_0.8365.acc_90.2491.dist_0.0521.epoch_85')
-
-#print(loader.model)
-#data = TabSeparated('/home/ubuntu/transducer-rework/neural-transducer/data/latin-train',
-#                    load_vocab='/home/ubuntu/transducer-rework/neural-transducer/checkpoints/transformer/transformer/transformer-dene0.3/latin-high-.vocab')
-
-
-#src, mask = data.batch_sample(batch_size=64).__next__()
-
-#print("TESTINGGGG")
-
-#loader.model.eval()
-
-#loader.model(data.batch_sample(batch_size=64).__next__())
-
-#decoder = decoding.Decoder(decoder_type=decoding.Decode.greedy)
-
-#res, _ = decoder(loader.model, src, mask)
-
-#pred = util.unpack_batch(res)
-
-#for p in pred:
-#    p = data.decode_target(p)
-#    print(p)
-
-# // TODO: essentially need to rewrite the library so that we store that source
-#  and target vocab somewhere that is recoverable, not just the dataloader
