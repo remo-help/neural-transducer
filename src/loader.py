@@ -413,4 +413,7 @@ class DirectLoader(InferenceDataloader):
                 yield list(X), list(y)
 
 
+if __name__ == "__main__":
+    loader = Loader(cli=True)
 
+    loader.run()
