@@ -56,8 +56,10 @@ class Loader:
                 self.vocab_file = self.params.model + 'vocab'
             else:
                 self.vocab_file = None
-
-        self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
+        if self.params.datatype == 'direct':
+            self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
+        else:
+            self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
 
         if self.params.decode_fn == 'beam':
             self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=3)
@@ -89,6 +91,8 @@ class Loader:
 
         parser.add_argument('--batch_size', required=False, type=int, help="batch_size for inference",
                             default=64)
+        parser.add_argument('--datatype', required=False, type=str, help="The type of data being read",
+                                                                      default=None, choices= ['tabseparated', 'direct'])
 
     def get_params(self):
         return self.parser.parse_args()
