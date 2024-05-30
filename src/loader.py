@@ -6,10 +6,10 @@ from typing import Dict, List, Optional
 from math import ceil
 import numpy as np
 import pickle as pkl
-from . import util
-from . import trainer
-from . import dataloader
-from . import decoding
+import util
+
+import dataloader
+import decoding
 import argparse
 
 # we need this because loading a pytorch model we need to reference the model class in the same folder,

@@ -1,8 +1,8 @@
 """
 test
 """
-from .decoding import get_decode_fn
-from .train import Trainer
+from decoding import get_decode_fn
+from train import Trainer
 
 
 def main():

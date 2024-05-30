@@ -15,7 +15,7 @@ import numpy as np
 from torch.optim.lr_scheduler import LambdaLR
 from tqdm import tqdm
 
-from .dataloader import BOS_IDX, EOS_IDX, STEP_IDX
+from dataloader import BOS_IDX, EOS_IDX, STEP_IDX
 
 tqdm = partial(tqdm, bar_format="{l_bar}{r_bar}")
 
