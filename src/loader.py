@@ -11,10 +11,18 @@ from . import trainer
 from . import dataloader
 from . import decoding
 import argparse
+
 # we need this because loading a pytorch model we need to reference the model class in the same folder,
 # so if we want to load a model from a higher working directory, we need to make sure pytorch can fidn the path
 import sys
-sys.path.insert(0, './src')
+from pathlib import Path
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in dirs:
+            return os.path.join(root, name)
+pth = find("libalign.so", Path.cwd())
+if pth:
+    sys.path.insert(0, pth)
 
 
 BOS = "<BOS>"
