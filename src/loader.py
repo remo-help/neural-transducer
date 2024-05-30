@@ -18,8 +18,10 @@ import sys
 from pathlib import Path
 def find(name, path):
     for root, dirs, files in os.walk(path):
-        if name in dirs:
-            return os.path.join(root, name)
+        if name in files:
+            full = os.path.join(root, name)
+            dir = os.path.dirname(full)
+            return dir
 
 
 
@@ -46,7 +48,7 @@ class Loader:
         self.model = None
         self.parser = argparse.ArgumentParser()
 
-        pth = find("/src", Path.cwd())
+        pth = find("transformer.py", Path.cwd())
         print('test')
         if pth:
             print(pth)
