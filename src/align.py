@@ -17,9 +17,23 @@
 # MH20151102
 
 from pathlib import Path
+import os
 import itertools
 from ctypes import POINTER, c_int, c_void_p, cdll
-absolute_path = Path("libalign.so").resolve()
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
+
+if os.path.exists("libalign.so"):
+    absolute_path = Path("libalign.so").resolve()
+else:
+    pth = find("libalign.so", Path.cwd())
+    if pth:
+        absolute_path = pth
+    else:
+        exit("libalign.so not found")
+
 libalign = cdll.LoadLibrary(absolute_path)
 
 libalign_add_int_pair = libalign.add_int_pair
