@@ -42,7 +42,7 @@ class Loader:
                 for key in config:
                     if key != 'file':
                         config_list.extend(f'--{key} {config[key]}'.split())
-                        config_list.append(f'--file placeholder'.split())
+                        config_list.extend(f'--file placeholder'.split())
                 self.params = self.parser.parse_args(config_list)
                 self.params.file = config['file']
             else:
