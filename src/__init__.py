@@ -1,3 +1,4 @@
+from . import util
 from . import loader
 from . import align
 from . import dataloader
@@ -8,4 +9,3 @@ from . import test
 from . import train
 from . import trainer
 from . import transformer
-from . import util
