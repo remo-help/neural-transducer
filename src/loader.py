@@ -10,6 +10,7 @@ from . import util
 from . import trainer
 from . import dataloader
 from . import decoding
+from . import transformer
 import argparse
 
 BOS = "<BOS>"
