@@ -22,6 +22,7 @@ def find(name, path):
             return os.path.join(root, name)
 pth = find("libalign.so", Path.cwd())
 if pth:
+    print(path)
     sys.path.insert(0, pth)
 
 
