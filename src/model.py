@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import Distribution
 
-from dataloader import PAD_IDX, STEP_IDX
+from .dataloader import PAD_IDX, STEP_IDX
 
 EPSILON = 1e-7
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
