@@ -20,10 +20,7 @@ def find(name, path):
     for root, dirs, files in os.walk(path):
         if name in dirs:
             return os.path.join(root, name)
-pth = find("libalign.so", Path.cwd())
-if pth:
-    print(path)
-    sys.path.insert(0, pth)
+
 
 
 BOS = "<BOS>"
@@ -48,6 +45,11 @@ class Loader:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
         self.parser = argparse.ArgumentParser()
+
+        pth = find("/src", Path.cwd())
+        if pth:
+            print(pth)
+            sys.path.insert(0, pth)
 
         if not cli:
             self.set_args()
