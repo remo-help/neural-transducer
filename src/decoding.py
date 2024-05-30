@@ -61,7 +61,8 @@ class Decoder(object):
                 decode_fn = decode_beam_transformer
             elif isinstance(transducer, (TagTransformer, transformer.TagTransformer)):
                 decode_fn = decode_beam_transformer
-            elif 'transformer' in transducer.__class__:
+            # this is an ugly hack, but when the modules are called from outside the instance check does not work
+            elif 'transformer' in str(transducer.__class__):
                 decode_fn = decode_beam_transformer
             else:
                 decode_fn = decode_beam_search_default
