@@ -385,7 +385,7 @@ def decode_beam_transformer(
     """
     src_sentence: [seq_len]
     """
-    assert isinstance(transducer, Transformer)
+    assert isinstance(transducer, Transformer) or 'transformer' in str(transducer.__class__)
 
     transducer.eval()
     src_mask = (src_mask == 0).transpose(0, 1)
