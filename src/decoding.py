@@ -34,7 +34,6 @@ class Decoder(object):
         self.skip_attn = skip_attn
 
     def __call__(self, transducer, src_sentence, src_mask):
-        print(type(transducer))
         if self.type == Decode.greedy:
             if isinstance(transducer, HardMonoTransducer):
                 decode_fn = decode_greedy_mono
@@ -61,6 +60,8 @@ class Decoder(object):
             elif isinstance(transducer, Transformer):
                 decode_fn = decode_beam_transformer
             elif isinstance(transducer, (TagTransformer, transformer.TagTransformer)):
+                decode_fn = decode_beam_transformer
+            elif 'transformer' in transducer.__class__:
                 decode_fn = decode_beam_transformer
             else:
                 decode_fn = decode_beam_search_default
