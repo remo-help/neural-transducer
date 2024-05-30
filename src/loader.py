@@ -10,8 +10,12 @@ from . import util
 from . import trainer
 from . import dataloader
 from . import decoding
-from . import transformer
 import argparse
+# we need this because loading a pytorch model we need to reference the model class in the same folder,
+# so if we want to load a model from a higher working directory, we need to make sure pytorch can fidn the path
+import sys
+sys.path.insert(0, './src')
+
 
 BOS = "<BOS>"
 EOS = "<EOS>"
