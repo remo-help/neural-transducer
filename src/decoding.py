@@ -6,7 +6,7 @@ from . import util
 from .dataloader import BOS_IDX, EOS_IDX, STEP_IDX
 from .model import HardMonoTransducer, HMMTransducer, dummy_mask
 from .transformer import Transformer, TagTransformer
-from . import transformer
+
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -39,7 +39,7 @@ class Decoder(object):
                 decode_fn = decode_greedy_mono
             elif isinstance(transducer, HMMTransducer):
                 decode_fn = decode_greedy_hmm
-            elif isinstance(transducer, Transformer):
+            elif isinstance(transducer, Transformer) or 'transformer' in str(transducer.__class__):
                 decode_fn = decode_greedy_transformer
             else:
                 decode_fn = decode_greedy_default
@@ -58,8 +58,6 @@ class Decoder(object):
             elif isinstance(transducer, HMMTransducer):
                 decode_fn = decode_beam_hmm
             elif isinstance(transducer, Transformer):
-                decode_fn = decode_beam_transformer
-            elif isinstance(transducer, (TagTransformer, transformer.TagTransformer)):
                 decode_fn = decode_beam_transformer
             # this is an ugly hack, but when the modules are called from outside the instance check does not work
             elif 'transformer' in str(transducer.__class__):
@@ -221,7 +219,7 @@ def decode_greedy_transformer(
     """
     src_sentence: [seq_len]
     """
-    assert isinstance(transducer, Transformer)
+    assert isinstance(transducer, Transformer) or 'transformer' in str(transducer.__class__)
     transducer.eval()
     src_mask = (src_mask == 0).transpose(0, 1)
     enc_hs = transducer.encode(src_sentence, src_mask)
