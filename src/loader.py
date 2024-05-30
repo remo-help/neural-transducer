@@ -303,10 +303,8 @@ class InferenceDataloader(dataloader.Dataloader):
         if self.inference_mode:
             if not self.cli:
                 key = 'placeholder'
-                print(key)
             else:
                 key = self._file_identifier(file)
-                print(key)
             if key not in self.batch_data:
                 lst = list()
                 for src in tqdm(self._iter_helper(file), desc="read file"):

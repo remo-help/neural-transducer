@@ -5,7 +5,7 @@ import torch
 from . import util
 from .dataloader import BOS_IDX, EOS_IDX, STEP_IDX
 from .model import HardMonoTransducer, HMMTransducer, dummy_mask
-from .transformer import Transformer
+from .transformer import Transformer, TagTransformer
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -57,6 +57,8 @@ class Decoder(object):
             elif isinstance(transducer, HMMTransducer):
                 decode_fn = decode_beam_hmm
             elif isinstance(transducer, Transformer):
+                decode_fn = decode_beam_transformer
+            elif isinstance(transducer, TagTransformer):
                 decode_fn = decode_beam_transformer
             else:
                 decode_fn = decode_beam_search_default
