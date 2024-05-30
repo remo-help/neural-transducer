@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 from math import ceil
 import numpy as np
 import pickle as pkl
-import util
+from . import util
 
 import dataloader
 import decoding
