@@ -132,6 +132,7 @@ class Loader:
         #self.logger.info("load model in %s", model)
         self.model = torch.load(path, map_location=self.device)
         self.model = self.model.to(self.device)
+        print(type(self.model))
 
     def load_data(self):
         # do_something
