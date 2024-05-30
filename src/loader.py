@@ -47,6 +47,7 @@ class Loader:
         self.parser = argparse.ArgumentParser()
 
         pth = find("/src", Path.cwd())
+        print('test')
         if pth:
             print(pth)
             sys.path.insert(0, pth)
