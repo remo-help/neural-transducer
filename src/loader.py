@@ -85,10 +85,11 @@ class Loader:
             else:
                 self.vocab_file = None
         if self.params.datatype == 'direct':
-            self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
+            self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
+                                     cli=self.cli)
         else:
             self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
-                                     cli = self.cli)
+                                    )
 
         if self.params.decode_fn == 'beam':
             self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=3)
