@@ -1,3 +1,7 @@
+# On this Fork
+This fork contains functionality that allows to load and use stored models for inference after the experimental setup.
+
+
 # Neural Transducer
 
 This repo contains a set of neural transducer, e.g. sequence-to-sequence model, focusing on character-level tasks. It powers the following papers and workshop.
