@@ -3,9 +3,9 @@ from collections import namedtuple
 import torch
 
 import util
-from dataloader import BOS_IDX, EOS_IDX, STEP_IDX
-from model import HardMonoTransducer, HMMTransducer, dummy_mask
-from transformer import Transformer
+from .dataloader import BOS_IDX, EOS_IDX, STEP_IDX
+from .model import HardMonoTransducer, HMMTransducer, dummy_mask
+from .transformer import Transformer
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
