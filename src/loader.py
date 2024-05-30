@@ -437,7 +437,7 @@ class DirectLoader(InferenceDataloader):
     def read_file(self, file, inference=True):
         if inference:
             for item in file:
-                yield list(item)
+                yield [item]
         else:
             for item in file:
                 X, y = item
