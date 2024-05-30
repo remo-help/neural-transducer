@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import torch
 
-import util
+from . import util
 from .dataloader import BOS_IDX, EOS_IDX, STEP_IDX
 from .model import HardMonoTransducer, HMMTransducer, dummy_mask
 from .transformer import Transformer

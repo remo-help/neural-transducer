@@ -6,10 +6,10 @@ from typing import Dict, List, Optional
 from math import ceil
 import numpy as np
 import pickle as pkl
-import util
-import trainer
-import dataloader
-import decoding
+from . import util
+from . import trainer
+from . import dataloader
+from . import decoding
 import argparse
 
 BOS = "<BOS>"

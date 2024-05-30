@@ -7,12 +7,12 @@ from functools import partial
 import torch
 from tqdm import tqdm
 
-import dataloader
-import model
-import transformer
-import util
-from decoding import Decode, get_decode_fn
-from trainer import BaseTrainer
+from . import dataloader
+from . import model
+from . import transformer
+from . import util
+from .decoding import Decode, get_decode_fn
+from .trainer import BaseTrainer
 
 tqdm.monitor_interval = 0
 

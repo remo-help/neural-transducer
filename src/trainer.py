@@ -13,7 +13,7 @@ import torch
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 
-import util
+from . import util
 
 tqdm.monitor_interval = 0
 
