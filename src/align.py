@@ -16,10 +16,10 @@
 # Author: Mans Hulden
 # MH20151102
 
-import os
+from pathlib import Path
 import itertools
 from ctypes import POINTER, c_int, c_void_p, cdll
-absolute_path = os.path.abspath("libalign.so")
+absolute_path = p = Path("libalign.so").resolve()
 libalign = cdll.LoadLibrary(absolute_path)
 
 libalign_add_int_pair = libalign.add_int_pair
