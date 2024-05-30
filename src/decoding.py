@@ -34,6 +34,7 @@ class Decoder(object):
         self.skip_attn = skip_attn
 
     def __call__(self, transducer, src_sentence, src_mask):
+        print(type(transducer))
         if self.type == Decode.greedy:
             if isinstance(transducer, HardMonoTransducer):
                 decode_fn = decode_greedy_mono
