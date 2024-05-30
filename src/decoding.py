@@ -59,7 +59,7 @@ class Decoder(object):
                 decode_fn = decode_beam_hmm
             elif isinstance(transducer, Transformer):
                 decode_fn = decode_beam_transformer
-            elif isinstance(transducer, TagTransformer) or isinstance(transducer, transformer.TagTransformer):
+            elif isinstance(transducer, (TagTransformer, transformer.TagTransformer)):
                 decode_fn = decode_beam_transformer
             else:
                 decode_fn = decode_beam_search_default
