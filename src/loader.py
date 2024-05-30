@@ -47,6 +47,7 @@ class Loader:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = None
         self.parser = argparse.ArgumentParser()
+        self.cli = cli
 
         pth = find("transformer.py", Path.cwd())
         print('test')
@@ -86,7 +87,8 @@ class Loader:
         if self.params.datatype == 'direct':
             self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
         else:
-            self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode)
+            self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
+                                     cli = self.cli)
 
         if self.params.decode_fn == 'beam':
             self.decoder = decoding.Decoder(decoder_type=decoding.Decode.beam, max_len=30, beam_size=3)
@@ -212,7 +214,8 @@ class InferenceDataloader(dataloader.Dataloader):
             test_file: Optional[List[str]] = None,
             shuffle=False,
             load_vocab=None,
-            inference_mode=True
+            inference_mode=True,
+            cli = True
     ):
         super().__init__()
         self.file = file[0] if len(file) == 1 else file
@@ -228,6 +231,7 @@ class InferenceDataloader(dataloader.Dataloader):
         self.target_vocab_size = len(self.target)
         self.inference_mode = inference_mode
         self.attr_c2i: Optional[Dict]
+        self.cli = cli
         if self.nb_attr > 0:
             self.source_c2i = {c: i for i, c in enumerate(self.source[: -self.nb_attr])}
             self.attr_c2i = {
@@ -296,7 +300,10 @@ class InferenceDataloader(dataloader.Dataloader):
 
     def _batch_sample(self, batch_size, file, shuffle):
         if self.inference_mode:
-            key = self._file_identifier(file)
+            if not self.cli:
+                key = 'placeholder'
+            else:
+                key = self._file_identifier(file)
             if key not in self.batch_data:
                 lst = list()
                 for src in tqdm(self._iter_helper(file), desc="read file"):
