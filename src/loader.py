@@ -85,6 +85,9 @@ class Loader:
         if self.params.datatype == 'direct':
             self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
                                      cli=self.cli)
+        elif self.params.datatype == 'directfile':
+            self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
+                                     cli=self.cli)
         else:
             self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
                                     )
@@ -120,7 +123,8 @@ class Loader:
         parser.add_argument('--batch_size', required=False, type=int, help="batch_size for inference",
                             default=64)
         parser.add_argument('--datatype', required=False, type=str, help="The type of data being read",
-                                                                      default=None, choices= ['tabseparated', 'direct'])
+                                                                      default=None, choices= ['tabseparated', 'direct',
+                                                                                              'directfile'])
 
     def get_params(self):
         return self.parser.parse_args()
