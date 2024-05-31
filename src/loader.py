@@ -50,7 +50,6 @@ class Loader:
         self.cli = cli
 
         pth = find("transformer.py", Path.cwd())
-        print('test')
         if pth:
             print(pth)
             sys.path.insert(0, pth)
