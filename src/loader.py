@@ -191,7 +191,8 @@ class Loader:
                 decodes.append(p)
             results.extend(decodes)
         self.results = results
-        self.save_results_inference()
+        if self.cli:
+            self.save_results_inference()
         return results
 
     def save_results_inference(self):
