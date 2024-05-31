@@ -6,7 +6,7 @@ import torch
 import pickle as pkl
 from tqdm import tqdm
 
-from src.align import Aligner
+from align import Aligner
 
 BOS = "<BOS>"
 EOS = "<EOS>"
