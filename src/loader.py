@@ -86,7 +86,7 @@ class Loader:
             self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
                                      cli=self.cli)
         elif self.params.datatype == 'directfile':
-            self.data = DirectLoader(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
+            self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
                                      cli=self.cli)
         else:
             self.data = TabSeparated(self.params.file, load_vocab=self.vocab_file, inference_mode=self.mode,
