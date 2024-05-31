@@ -444,11 +444,10 @@ class DirectLoader(InferenceDataloader):
     '''
     Used to pass data directly, instead of loading it from a file.
     '''
-
     def read_file(self, file, inference=True):
         if inference:
             for item in file:
-                yield [item]
+                yield list(item)
         else:
             for item in file:
                 X, y = item
