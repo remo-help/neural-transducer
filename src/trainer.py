@@ -199,12 +199,12 @@ class BaseTrainer(object):
 
     def save_training(self, model_fp):
         save_objs = (self.optimizer.state_dict(), self.scheduler.state_dict())
-        torch.save(save_objs, f"{model_fp}.progress")
+        torch.save(save_objs, f"{model_fp}-progress")
 
     def load_training(self, model_fp):
         assert self.model is not None
-        if os.path.isfile(f"{model_fp}.progress"):
-            optimizer_state, scheduler_state = torch.load(f"{model_fp}.progress")
+        if os.path.isfile(f"{model_fp}-progress"):
+            optimizer_state, scheduler_state = torch.load(f"{model_fp}-progress")
             self.optimizer.load_state_dict(optimizer_state)
             self.scheduler.load_state_dict(scheduler_state)
         else:
