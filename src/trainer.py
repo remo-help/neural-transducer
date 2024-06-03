@@ -355,7 +355,7 @@ class BaseTrainer(object):
                 if model.filepath in save_fps:
                     continue
                 os.remove(model.filepath)
-        os.remove(f"{model_fp}.progress")
+        os.remove(f"{model_fp}-progress")
 
     def run(self, start_epoch, decode_fn=None):
         """
